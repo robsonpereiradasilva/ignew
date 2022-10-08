@@ -9,6 +9,8 @@
 
     --gray-100: #e1e1e6;
     --gray-300: #a8a8b3;
+    --gray-800: #29292e;
+    --gray-850: #29293e;
     --gray-900: #121214;
 
     --cyan-500: #61dafb;
@@ -22,10 +24,10 @@
 }
 
 @media (max-width: 720px) {
-    html{
+    html {
         font-size: 87.4;
     }
-    
+
 }
 
 body {
