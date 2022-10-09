@@ -1,19 +1,21 @@
 import { FaGithub } from 'react-icons/fa';
 import { FaDoorClosed } from 'react-icons/fa';
+import { signIn, signOut, useSession } from 'next-auth/react';
 
 import styles from './styles.module.scss'
 
 
 export function SignInButton() {
 
-    const isUserLoggedIn = true;
-    return isUserLoggedIn ? (
+    const { data: session } = useSession();
+    return session ? (
         <button
             type='button'
             className={styles.signInButton}
+            onClick={() => signOut()}
         >
-            <FaGithub color='#04d361'/>
-            Logged with User
+            <FaGithub color='#04d361' />
+            {session.user.name}
             <FaDoorClosed color='#737380' className={styles.closeIcon} />
         </button>
     ) :
@@ -21,9 +23,11 @@ export function SignInButton() {
             <button
                 type='button'
                 className={styles.signInButton}
+                onClick={() => signIn('github')}
             >
                 <FaGithub color="#eba417" />
                 Sign in with Github
             </button>
+
         )
 }
