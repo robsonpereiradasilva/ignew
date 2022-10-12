@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/react"
 import { query } from 'faunadb';
@@ -7,7 +8,7 @@ import { fauna } from "../../services/fauna";
 type User = {
     ref: {
         id: string;
-    },
+    }
     data: {
         stripe_customer_id: string;
     }
@@ -39,13 +40,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 query.Update(
                     query.Ref(query.Collection('users'), user.ref.id),
                     {
-                        data: {
-                            stripe_customer_id: stripeCustomer.id
-                        }
+                        data: {stripe_customer_id: stripeCustomer.id}
                     }
                 )
             )
-
             customerId = stripeCustomer.id;
         }
      
