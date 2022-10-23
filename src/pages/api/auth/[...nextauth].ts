@@ -38,10 +38,10 @@ export default NextAuth({
           )
         )
         return true
-      } catch {
-        return false
+      } catch (error){
+       return false;
 
       }
-    }
+    },
   }
 }) 
