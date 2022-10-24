@@ -2,9 +2,22 @@ import { GetStaticProps } from "next";
 import Head from "next/head";
 import { getPrismicClient } from "../../services/primisc";
 import styles from './styles.module.scss';
+import Prismic from '@prismicio/client'
+import { RichText } from 'prismic-dom'
+
+type Post = {
+    slug: string;
+    title: string;
+    excerpt: string;
+    updateAt: string;
+}
+
+interface PostsProps {
+    posts: Post[]
+}
 
 
-export default function Posts() {
+export default function Posts({ posts }: PostsProps) {
     return (
         <>
             <Head>
@@ -12,27 +25,14 @@ export default function Posts() {
             </Head>
             <main className={styles.container}>
                 <div className={styles.posts}>
-                    <a href="#">
-                        <time>15 de Outubro 2022</time>
-                        <strong>Android Audio and Homepage Topics</strong>
-                        <p>Your time matters. That’s why our team is committed to helping you get the most out of the time you spend reading on Medium.
-                            This  means helping you find stories that are relevant to your interests and  goals; knowledge that goes beyond entertainment to positively impact  your life.
-                            It also means helping you access that knowledge in ways that  are convenient and enjoyable for you.</p>
-                    </a>
-                    <a href="#">
-                        <time>15 de Outubro 2022</time>
-                        <strong>Android Audio and Homepage Topics</strong>
-                        <p>Your time matters. That’s why our team is committed to helping you get the most out of the time you spend reading on Medium.
-                            This  means helping you find stories that are relevant to your interests and  goals; knowledge that goes beyond entertainment to positively impact  your life.
-                            It also means helping you access that knowledge in ways that  are convenient and enjoyable for you.</p>
-                    </a>
-                    <a href="#">
-                        <time>15 de Outubro 2022</time>
-                        <strong>Android Audio and Homepage Topics</strong>
-                        <p>Your time matters. That’s why our team is committed to helping you get the most out of the time you spend reading on Medium.
-                            This  means helping you find stories that are relevant to your interests and  goals; knowledge that goes beyond entertainment to positively impact  your life.
-                            It also means helping you access that knowledge in ways that  are convenient and enjoyable for you.</p>
-                    </a>
+                    {posts.map(post => (
+                        // eslint-disable-next-line react/jsx-key
+                        <a key={post.slug} href="#">
+                            <time>{post.updateAt}</time>
+                            <strong>{post.title}</strong>
+                            <p>{post.excerpt}</p>
+                        </a>
+                    ))}
                 </div>
             </main>
         </>
@@ -40,15 +40,32 @@ export default function Posts() {
 }
 
 
-export const getStaticProps: GetStaticProps =  async ()=>{
-    const prismic = getPrismicClient()
+export const getStaticProps: GetStaticProps = async () => {
+    const prismic = getPrismicClient()    
 
-    const response =  await prismic.queryContentFromRef(
-        
-    )
+    const response = await prismic.query([
+        Prismic.predicates.at('document.type', 'post')], {
+        fetch: ['post.title', 'post.content'],
+        pageSize: 100,
+    })
 
+     
+    const posts = response.results.map(post => {
+        return {
+            slug: post.uid,
+            title: RichText.asText(post.data.title),
+            excerpt: post.data.content.find(content => content.type === 'paragraph')?.text ?? '',
+            updateAt: new Date(post.last_publication_date).toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            })}
+    })
+    console.log("Response" + response)
     return {
-        props:{}
+        props: {
+            posts
+        }
     }
 }
 
